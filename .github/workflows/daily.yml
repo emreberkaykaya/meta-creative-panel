@@ -1,0 +1,53 @@
+name: Daily Creative Panel
+
+on:
+  # Her gün 05:00 UTC = 08:00 İstanbul. Dönemler dünün sonunda bittiği için
+  # günde bir çalışmak yeterli; ana paneldeki 2 saatlik tempoya gerek yok.
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build creative panel
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_ACCESS_TOKEN_AQUA_DI_POLO: ${{ secrets.META_ACCESS_TOKEN_AQUA_DI_POLO }}
+          META_ACCESS_TOKEN_FRIME: ${{ secrets.META_ACCESS_TOKEN_FRIME }}
+          META_ACCESS_TOKEN_PIERRE_CARDIN: ${{ secrets.META_ACCESS_TOKEN_PIERRE_CARDIN }}
+        run: python creative_sync.py
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

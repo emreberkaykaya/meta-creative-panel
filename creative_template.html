@@ -1,0 +1,249 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creative Raporu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#e9eded; --surface:#ffffff; --surface-2:#f4f6f6;
+  --ink:#10181a; --ink-2:#3c4a4d; --muted:#526366;
+  --line:#d2dadb; --line-soft:#e4eaea;
+  --accent:#0f5d68; --accent-soft:#d8e8ea; --neutral-bar:#9fb0b2;
+  --pos:#1a7f5a; --warn:#a76a15; --crit:#b23b3b; --track:#dde5e5;
+  --shadow:0 1px 2px rgba(16,24,26,.05), 0 8px 24px -16px rgba(16,24,26,.35);
+  --on-accent:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d1314; --surface:#151d1f; --surface-2:#1b2426;
+    --ink:#e7eeee; --ink-2:#bcc9ca; --muted:#8ba0a2;
+    --line:#283436; --line-soft:#212c2e;
+    --accent:#5cb6c2; --accent-soft:#17383d; --neutral-bar:#4a5a5c;
+    --pos:#4fc294; --warn:#dda34a; --crit:#e57373; --track:#232e30;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    --on-accent:#08181b;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d1314; --surface:#151d1f; --surface-2:#1b2426;
+  --ink:#e7eeee; --ink-2:#bcc9ca; --muted:#8ba0a2;
+  --line:#283436; --line-soft:#212c2e;
+  --accent:#5cb6c2; --accent-soft:#17383d; --neutral-bar:#4a5a5c;
+  --pos:#4fc294; --warn:#dda34a; --crit:#e57373; --track:#232e30;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  --on-accent:#08181b;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 20px 72px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+
+/* ---- üst bar ---- */
+.bar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:16px 24px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.title{display:flex;flex-direction:column;gap:4px}
+.title h1{margin:0;font-family:Archivo,sans-serif;font-weight:800;
+  font-size:clamp(22px,2.6vw,28px);letter-spacing:-.022em}
+.stamp{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--pos);flex:none}
+.periods{display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:3px;gap:2px;box-shadow:var(--shadow)}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);
+  font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:500;
+  padding:7px 14px;border-radius:5px;cursor:pointer;white-space:nowrap;
+  transition:background .16s ease,color .16s ease}
+.seg button:hover{background:var(--surface-2);color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.range{font-size:11.5px;color:var(--muted);padding-left:3px}
+
+.rule{font-size:12.5px;color:var(--muted);margin:0;max-width:80ch}
+.rule b{color:var(--ink-2);font-weight:600}
+
+/* ---- marka bölümü ---- */
+.brand{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.brand-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand-id{display:flex;align-items:center;gap:10px}
+.brand h2{margin:0;font-family:Archivo,sans-serif;font-weight:800;font-size:21px;letter-spacing:-.022em}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.07em;
+  text-transform:uppercase;padding:3px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.brand-ctx{font-size:12px;color:var(--muted)}
+.brand-ctx b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink-2)}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+/* ---- creative kartı ---- */
+.cr{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.thumb{position:relative;aspect-ratio:1/1;background:var(--surface-2);overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .noimg{position:absolute;inset:0;display:grid;place-items:center;
+  font-size:12px;color:var(--muted)}
+.rank{position:absolute;top:10px;left:10px;font-family:Archivo,sans-serif;font-weight:800;
+  font-size:15px;line-height:1;padding:7px 9px;border-radius:7px;
+  background:var(--ink);color:var(--surface);letter-spacing:-.01em}
+.fmt{position:absolute;top:10px;right:10px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:5px;
+  background:rgba(16,24,26,.72);color:#fff}
+.cr-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px;flex:1}
+.cr-name{font-size:12.5px;color:var(--ink-2);line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+.cr-roas{display:flex;align-items:baseline;gap:8px}
+.cr-roas b{font-family:Archivo,sans-serif;font-weight:700;font-size:34px;line-height:1;
+  letter-spacing:-.035em;font-variant-numeric:tabular-nums;color:var(--bc)}
+.cr-roas span{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:0;
+  padding-top:12px;border-top:1px solid var(--line-soft)}
+.kv > div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kv dt{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.kv dd{margin:0;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:14.5px;font-weight:500}
+.vid{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.vid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink-2)}
+.cr-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding-top:10px;border-top:1px solid var(--line-soft);font-size:11.5px;color:var(--muted)}
+.cr-foot a{color:var(--accent);font-weight:600;text-decoration:none}
+.cr-foot a:hover{text-decoration:underline}
+.cr-foot a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+
+.empty{border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;
+  min-height:220px;padding:20px;text-align:center;font-size:12.5px;color:var(--muted)}
+
+.notes{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}
+.notes p{margin:0;font-size:12px;color:var(--muted);line-height:1.6;max-width:80ch}
+.notes b{color:var(--ink-2);font-weight:600}
+
+@media (max-width:880px){ .cards{grid-template-columns:1fr 1fr} }
+@media (max-width:580px){ .cards{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="bar">
+    <div class="title">
+      <span class="eyebrow">Trendyol CPAS · katalog dışı creative'ler</span>
+      <h1>Creative Raporu</h1>
+      <span class="stamp"><span class="dot"></span> Meta Graph API · son senkron <span class="mono" id="stamp"></span></span>
+    </div>
+    <div class="periods">
+      <div class="seg" role="group" aria-label="Dönem seçimi" id="seg"></div>
+      <span class="range" id="range"></span>
+    </div>
+  </header>
+
+  <p class="rule" id="rule"></p>
+
+  <main id="brands"></main>
+
+  <footer class="notes">
+    <p><b>Katalog reklamları hariç:</b> katalogdan otomatik üretilen dinamik carousel şablonları
+       sıralamaya girmez; kalanlar elle yüklenmiş videolar, collection'lar ve görsellerdir. CPAS'ta
+       her reklam atıf için Trendyol kataloğuna bağlı olduğundan "katalog dışı" bu anlama geliyor.
+       Aynı video birden çok reklamda kullanılıyorsa tek creative olarak toplanır.
+       <b>Shared ROAS</b> = Trendyol'la paylaşılan katalog kalemlerinin cirosu ÷ harcama (Meta
+       <b>catalog_segment</b>, ana panelle aynı kaynak). <b>CTR</b> link tıklama oranıdır.
+       <b>3 sn izleme</b> videonun en az 3 saniye izlenme oranı, <b>ThruPlay</b> 15 saniye ya da
+       sonuna kadar izlenme oranı — ikisi de gösterime göre. Dönemler dünün sonunda biter.</p>
+  </footer>
+</div>
+
+<script>
+/*__DATA__*/
+
+const tl  = new Intl.NumberFormat("tr-TR",{maximumFractionDigits:0});
+const tl2 = new Intl.NumberFormat("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const money = v => "₺" + tl.format(Math.round(v));
+const pct   = v => "%" + tl2.format(v);
+const esc   = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const band  = r => r < 1 ? "crit" : r < 2 ? "warn" : "pos";
+
+// Uzun süreli 30 gün daha az gürültülü bir sıralama veriyor; varsayılan o.
+let current = DATA.periods.some(p => p.id === "30g") ? "30g" : DATA.periods[0].id;
+
+// Yalnızca https adreslerine link veriyoruz; API'den gelen değeri körü körüne href'e koymuyoruz.
+const safeUrl = u => (typeof u === "string" && /^https:\/\//.test(u)) ? u : null;
+
+function card(c, i){
+  const b = band(c.roas);
+  const preview = safeUrl(c.preview);
+  const video = c.format === "Video" && c.hook != null
+    ? `<div class="vid"><span>3 sn izleme <b>${pct(c.hook)}</b></span><span>ThruPlay <b>${pct(c.thruplay_rate)}</b></span></div>`
+    : "";
+  return `
+  <article class="cr" style="--bc:var(--${b})">
+    <div class="thumb">
+      ${c.thumb
+        ? `<img src="${esc(c.thumb)}" alt="${esc(c.name)} creative kapağı" loading="lazy" width="600" height="600">`
+        : `<div class="noimg">Kapak yok</div>`}
+      <span class="rank">#${i + 1}</span>
+      <span class="fmt">${esc(c.format)}</span>
+    </div>
+    <div class="cr-body">
+      <div class="cr-name" title="${esc(c.name)}">${esc(c.name)}</div>
+      <div class="cr-roas"><b>${tl2.format(c.roas)}×</b><span>shared ROAS</span></div>
+      <dl class="kv">
+        <div><dt>Harcama</dt><dd>${money(c.spend)}</dd></div>
+        <div><dt>Ciro</dt><dd>${money(c.value)}</dd></div>
+        <div><dt>Satış</dt><dd>${tl.format(c.purchases)}</dd></div>
+        <div><dt>CTR</dt><dd>${pct(c.ctr)}</dd></div>
+      </dl>
+      ${video}
+      <div class="cr-foot">
+        <span>${c.ads} reklamda kullanılıyor</span>
+        ${preview ? `<a href="${esc(preview)}" target="_blank" rel="noopener noreferrer">Reklamı gör ↗</a>` : ""}
+      </div>
+    </div>
+  </article>`;
+}
+
+function brandSection(b){
+  const r = b.by_period[current];
+  const share = r.total_spend ? r.manual_spend / r.total_spend * 100 : 0;
+  const slots = [...r.top.map(card)];
+  while (slots.length < 3){
+    slots.push(`<div class="empty">Bu dönemde eşiği geçen başka<br>katalog dışı creative yok.</div>`);
+  }
+  return `
+  <section class="brand" aria-labelledby="h-${esc(b.account)}">
+    <div class="brand-head">
+      <div class="brand-id"><h2 id="h-${esc(b.account)}">${esc(b.brand)}</h2><span class="chip">Trendyol</span></div>
+      <div class="brand-ctx">
+        <b>${r.manual_count}</b> katalog dışı creative · <b>${r.eligible_count}</b> eşiği geçti ·
+        katalog dışı harcama <b>${money(r.manual_spend)}</b> (toplamın ${pct(share)}'i)
+      </div>
+    </div>
+    <div class="cards">${slots.join("")}</div>
+  </section>`;
+}
+
+function render(){
+  const p = DATA.periods.find(x => x.id === current);
+  document.getElementById("range").textContent = p.range;
+  document.getElementById("rule").innerHTML =
+    `Sıralama: önce <b>shared ROAS</b>, eşitlikte <b>CTR</b>, sonra <b>harcama</b>. ` +
+    `Gürültüyü kesmek için bu dönemde en az <b>${money(p.min_spend)}</b> harcamış creative'ler sıralamaya girer.`;
+  document.getElementById("brands").innerHTML = DATA.brands.map(brandSection).join("");
+  document.querySelectorAll("#seg button").forEach(btn =>
+    btn.setAttribute("aria-pressed", String(btn.dataset.p === current)));
+}
+
+document.getElementById("stamp").textContent = DATA.updated;
+document.getElementById("seg").innerHTML = DATA.periods.map(p =>
+  `<button type="button" data-p="${esc(p.id)}" aria-pressed="false">${esc(p.label)}</button>`).join("");
+document.getElementById("seg").addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  current = btn.dataset.p;
+  render();
+});
+render();
+</script>
