@@ -10,6 +10,8 @@ Kurallar:
   varsa bu, katalogdan otomatik üretilen dinamik carousel şablonudur ve elenir.
   CPAS'ta her reklam atıf için pazaryeri kataloğuna bağlı olduğundan
   "katalog dışı" burada "elle yüklenmiş video/görsel" anlamına gelir.
+- Yalnızca yayında olan reklamlar: durumu ACTIVE ve dün en az 1 gösterim
+  almış. Kapatılmış reklamların creative'leri sıralamaya girmez.
 - Aynı video/görsel birden çok reklamda kullanılıyorsa reklam değil creative
   (video_id / image_hash) bazında toplanır.
 - Sıralama: shared ROAS, eşitlikte link CTR, sonra harcama.
@@ -49,10 +51,12 @@ ACCOUNTS = {
 }
 
 # (id, etiket, gün sayısı, sıralamaya girmek için gereken en az harcama ₺)
-# Eşik 30 günde ₺1.000; 7 günde aynı günlük tempoya denk gelen ₺250.
+# İki dönemde de aynı eşik: yalnızca aktif reklamlar sayıldığı için çoğu
+# creative 30 günden genç. 30 güne daha yüksek eşik koymak, birkaç gün önce
+# açılıp iyi giden creative'leri 30 günlük görünümden haksız yere düşürüyordu.
 PERIODS = [
     ("7g", "Son 7 Gün", 7, 250),
-    ("30g", "Son 30 Gün", 30, 1000),
+    ("30g", "Son 30 Gün", 30, 250),
 ]
 
 TOP_N = 3
@@ -67,7 +71,7 @@ INSIGHT_FIELDS = ",".join([
 ])
 
 AD_FIELDS = (
-    "id,name,preview_shareable_link,"
+    "id,name,effective_status,preview_shareable_link,"
     "creative{id,object_type,video_id,image_hash,object_story_spec,asset_feed_spec}"
 )
 
@@ -182,7 +186,19 @@ def fetch_ads(account: str, token: str, ad_ids: list) -> dict:
 # Hesap / dönem başına sıralama
 # ---------------------------------------------------------------------------
 
-def rank_creatives(account: str, token: str, days: int, min_spend: float) -> dict:
+def delivering_yesterday(account: str, token: str) -> set:
+    """Dün en az 1 gösterim almış reklamlar. Durumu ACTIVE görünüp aslında
+    yayın almayan reklamları elemek için durum kontrolüne ek olarak kullanılıyor."""
+    y = datetime.now(ISTANBUL).date() - timedelta(days=1)
+    rows = graph_all(
+        f"act_{account}/insights", token, level="ad", limit=500, fields="ad_id,impressions",
+        time_range=json.dumps({"since": str(y), "until": str(y)}),
+    )
+    return {r["ad_id"] for r in rows if int(r.get("impressions") or 0) >= 1}
+
+
+def rank_creatives(account: str, token: str, days: int, min_spend: float,
+                   live_ads: set) -> dict:
     since, until = period_range(days)
     insights = graph_all(
         f"act_{account}/insights", token, level="ad", limit=500, fields=INSIGHT_FIELDS,
@@ -198,6 +214,11 @@ def rank_creatives(account: str, token: str, days: int, min_spend: float) -> dic
         total_spend += spend
         ad = ads.get(r["ad_id"])
         if not ad:
+            continue
+        # Yalnızca şu an yayında olan reklamlar: ACTIVE durumu (kampanya, reklam
+        # seti ve reklam açık) ve dün en az 1 gösterim. Kapatılmış reklamların
+        # creative'leri geçmişte iyi olsa bile listeye girmiyor.
+        if ad.get("effective_status") != "ACTIVE" or r["ad_id"] not in live_ads:
             continue
         creative = ad.get("creative") or {}
         if is_catalog(creative):
@@ -295,10 +316,12 @@ def main():
 
     for brand, (account, env_var) in ACCOUNTS.items():
         token = token_for(env_var)
+        live_ads = delivering_yesterday(account, token)
+        print(f"{brand}: dün yayın alan {len(live_ads)} reklam")
         by_period = {}
         for pid, label, days, min_spend in PERIODS:
             print(f"Çekiliyor: {brand} / {label}...")
-            res = rank_creatives(account, token, days, min_spend)
+            res = rank_creatives(account, token, days, min_spend, live_ads)
             for g in res["top"]:
                 g["thumb"] = save_thumbnail(g["creative_id"], g["key"], token)
             by_period[pid] = res

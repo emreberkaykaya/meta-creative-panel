@@ -130,7 +130,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 <div class="wrap">
   <header class="bar">
     <div class="title">
-      <span class="eyebrow">Trendyol CPAS · katalog dışı creative'ler</span>
+      <span class="eyebrow">Trendyol CPAS · aktif, katalog dışı creative'ler</span>
       <h1>Creative Raporu</h1>
       <span class="stamp"><span class="dot"></span> Meta Graph API · son senkron <span class="mono" id="stamp"></span></span>
     </div>
@@ -149,6 +149,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
        sıralamaya girmez; kalanlar elle yüklenmiş videolar, collection'lar ve görsellerdir. CPAS'ta
        her reklam atıf için Trendyol kataloğuna bağlı olduğundan "katalog dışı" bu anlama geliyor.
        Aynı video birden çok reklamda kullanılıyorsa tek creative olarak toplanır.
+       <b>Aktif</b> = reklam, reklam seti ve kampanya açık ve reklam dün en az 1 gösterim almış;
+       kapatılmış reklamların creative'leri, geçmişte iyi olsalar da listede yer almaz.
        <b>Shared ROAS</b> = Trendyol'la paylaşılan katalog kalemlerinin cirosu ÷ harcama (Meta
        <b>catalog_segment</b>, ana panelle aynı kaynak). <b>CTR</b> link tıklama oranıdır.
        <b>3 sn izleme</b> videonun en az 3 saniye izlenme oranı, <b>ThruPlay</b> 15 saniye ya da
@@ -210,15 +212,15 @@ function brandSection(b){
   const share = r.total_spend ? r.manual_spend / r.total_spend * 100 : 0;
   const slots = [...r.top.map(card)];
   while (slots.length < 3){
-    slots.push(`<div class="empty">Bu dönemde eşiği geçen başka<br>katalog dışı creative yok.</div>`);
+    slots.push(`<div class="empty">Bu dönemde eşiği geçen başka<br>aktif katalog dışı creative yok.</div>`);
   }
   return `
   <section class="brand" aria-labelledby="h-${esc(b.account)}">
     <div class="brand-head">
       <div class="brand-id"><h2 id="h-${esc(b.account)}">${esc(b.brand)}</h2><span class="chip">Trendyol</span></div>
       <div class="brand-ctx">
-        <b>${r.manual_count}</b> katalog dışı creative · <b>${r.eligible_count}</b> eşiği geçti ·
-        katalog dışı harcama <b>${money(r.manual_spend)}</b> (toplamın ${pct(share)}'i)
+        <b>${r.manual_count}</b> aktif katalog dışı creative · <b>${r.eligible_count}</b> eşiği geçti ·
+        bunların harcaması <b>${money(r.manual_spend)}</b> (hesap toplamının ${pct(share)}'i)
       </div>
     </div>
     <div class="cards">${slots.join("")}</div>
@@ -230,6 +232,7 @@ function render(){
   document.getElementById("range").textContent = p.range;
   document.getElementById("rule").innerHTML =
     `Sıralama: önce <b>shared ROAS</b>, eşitlikte <b>CTR</b>, sonra <b>harcama</b>. ` +
+    `Yalnızca <b>şu an aktif</b> ve <b>dün gösterim almış</b> reklamlar sayılır. ` +
     `Gürültüyü kesmek için bu dönemde en az <b>${money(p.min_spend)}</b> harcamış creative'ler sıralamaya girer.`;
   document.getElementById("brands").innerHTML = DATA.brands.map(brandSection).join("");
   document.querySelectorAll("#seg button").forEach(btn =>
