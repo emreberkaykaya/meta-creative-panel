@@ -122,7 +122,6 @@ body{margin:0;background:var(--ground);color:var(--ink);
   text-transform:uppercase;padding:3px 7px;border-radius:5px;white-space:nowrap}
 .tag.fmt{background:rgba(10,16,18,.66);color:#fff}
 .tag.basis{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
-.tag.low{background:var(--surface);color:var(--warn-ink);border:1px solid var(--line)}
 .name{color:var(--ink-2);line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
 .big b{font-family:Archivo,sans-serif;font-weight:700;letter-spacing:-.035em;
   font-variant-numeric:tabular-nums;line-height:1}
@@ -257,13 +256,12 @@ const safeUrl = u => (typeof u === "string" && /^https:\/\//.test(u)) ? u : null
 // 30 gün daha az gürültülü bir sıralama verdiği için varsayılan o.
 let current = DATA.periods.some(p => p.id === "30g") ? "30g" : DATA.periods[0].id;
 
-// Kart neden bu sırada? Satış getirip eşiği geçenler ROAS'la, kalanlar CTR'yle.
-const byRoas = c => !c.low_data && c.roas > 0;
-
+// Kart neden bu sırada? ROAS'ı olanlar ROAS'la, olmayanlar CTR'yle (basis
+// senkronda belirleniyor, panel yeniden hesaplamıyor).
 function headline(c){
-  return byRoas(c)
+  return c.basis === "ROAS"
     ? {value: tl2.format(c.roas) + "×", label: "shared ROAS", color: `var(--${band(c.roas)})`, basis: "ROAS"}
-    : {value: pct(c.ctr), label: c.roas > 0 ? "CTR · ROAS az veri" : "CTR · satış yok", color: "var(--ink)", basis: "CTR"};
+    : {value: pct(c.ctr), label: "CTR · satış yok", color: "var(--ink)", basis: "CTR"};
 }
 
 function thumbImg(c, eager){
@@ -272,11 +270,11 @@ function thumbImg(c, eager){
     : `<div class="noimg">Kapak yok</div>`;
 }
 
-function tags(c, p){
+function tags(c){
   const h = headline(c);
   return `<span class="tag basis" title="Bu kart ${h.basis} sıralamasında">${h.basis} sırası</span>` +
-    (c.low_data
-      ? `<span class="tag low" title="Bu dönemde ${money(p.min_spend)} eşiğinin altında harcamış; rakamlar az veriye dayanıyor">Az veri</span>`
+    (c.ads > 1
+      ? `<span class="tag basis" title="Aynı görüntü ${c.ads} reklamda kullanılıyor; rakamlar toplam">${c.ads} reklam</span>`
       : "");
 }
 
@@ -300,7 +298,7 @@ function heroCard(c, p){
       <div class="over">
         <div class="over-top">
           <span class="rank" aria-label="1. sıra">#1</span>
-          <div class="over-tags"><span class="tag fmt">${esc(c.format)}</span>${tags(c, p)}</div>
+          <div class="over-tags"><span class="tag fmt">${esc(c.format)}</span>${tags(c)}</div>
         </div>
         <div class="big"><b>${h.basis === "ROAS" ? '<span class="band" aria-hidden="true"></span>' : ""}${h.value}</b><small>${h.label}</small></div>
       </div>
@@ -328,7 +326,7 @@ function miniCard(c, i, p){
       <span class="tag fmt">${esc(c.format)}</span>
     </div>
     <div class="body">
-      <div class="tags">${tags(c, p)}</div>
+      <div class="tags">${tags(c)}</div>
       <div class="big"><b>${h.value}</b><small>${h.label}</small></div>
       <div class="name" title="${esc(c.name)}">${esc(c.name)}</div>
       <dl class="kv">
@@ -354,6 +352,7 @@ function brandSection(b, p){
       <div class="brand-kpi">
         <span><b>${r.manual_count}</b> aktif creative</span>
         <span><b>${r.roas_count}</b> satış getirdi</span>
+        <span title="Çan eğrisi alt sınırı: daha az gösterim alan creative'ler sıralamaya girmez">eşik <b>${tl.format(r.min_impressions)}</b> gösterim</span>
         <span><b>${money(r.manual_spend)}</b> harcama · hesabın ${pct(share)}'i</span>
       </div>
     </div>
@@ -366,11 +365,12 @@ function render(){
   document.getElementById("range").textContent = `${p.label} · ${p.range}`;
   document.getElementById("how-list").innerHTML = `
     <li>Yalnızca <b>şu an aktif</b> ve <b>dün gösterim almış</b> reklamlar sayılır; katalog carousel'leri hariç.</li>
-    <li>Önce satış getirmiş ve bu dönemde en az <b>${money(p.min_spend)}</b> harcamış creative'ler <b>shared ROAS</b>'a göre sıralanır.
-        Eşik, tek bir şanslı satışla şişen ROAS'ı elemek için.</li>
-    <li>Kalan yerler ROAS'ı olmayanlarla <b>CTR</b>'ye göre dolar; bunun için en az
-        <b>${tl.format(DATA.min_fill_impressions)} gösterim</b> gerekir.</li>
-    <li>Harcaması ${money(p.min_spend)}'nin altında kalanlar <b>Az veri</b> diye işaretlenir.</li>`;
+    <li><b>Aynı video tek kart:</b> reklam kopyalanınca video yeniden yüklenip yeni ID alıyor; kapaklar görsel olarak
+        karşılaştırılıp birebir aynı olanlar birleştirilir, rakamları toplanır.</li>
+    <li><b>Çan eğrisi:</b> her hesabın creative'leri gösterim dağılımına göre değerlendirilir. Ortalamanın yarım standart
+        sapma altında kalan az gösterimli kuyruk elenir; böylece birkaç yüz gösterimle şişen ROAS ya da CTR öne çıkmaz.
+        Hesaba göre değişen bu sınır marka başlığında "eşik" olarak yazar.</li>
+    <li><b>Sıralama:</b> ROAS'ı olan her zaman önde, en yüksek <b>shared ROAS</b> birinci; ROAS'ı olmayanlar en yüksek <b>CTR</b>'ye göre.</li>`;
   document.getElementById("brands").innerHTML = DATA.brands.map(b => brandSection(b, p)).join("");
   document.querySelectorAll("#seg button").forEach(btn =>
     btn.setAttribute("aria-pressed", String(btn.dataset.p === current)));
