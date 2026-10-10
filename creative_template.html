@@ -5,23 +5,31 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
+/* Ana performans paneliyle aynı token'lar: iki panel kardeş gibi dursun.
+   --muted burada bir ton koyu (#526366): ana paneldeki değer zemin üzerinde
+   3,92 kontrast veriyordu, AA için 4,5 gerekir. */
 :root{
   --ground:#e9eded; --surface:#ffffff; --surface-2:#f4f6f6;
   --ink:#10181a; --ink-2:#3c4a4d; --muted:#526366;
   --line:#d2dadb; --line-soft:#e4eaea;
-  --accent:#0f5d68; --accent-soft:#d8e8ea; --neutral-bar:#9fb0b2;
-  --pos:#1a7f5a; --warn:#a76a15; --crit:#b23b3b; --track:#dde5e5;
+  --accent:#0f5d68; --accent-soft:#d8e8ea;
+  --pos:#1a7f5a; --warn:#a76a15; --crit:#b23b3b;
+  /* küçük metinde kullanılan turuncu: --warn beyaz üstünde 4,45 veriyordu */
+  --warn-ink:#8f5b12;
   --shadow:0 1px 2px rgba(16,24,26,.05), 0 8px 24px -16px rgba(16,24,26,.35);
+  --shadow-lift:0 2px 4px rgba(16,24,26,.06), 0 18px 36px -18px rgba(16,24,26,.45);
   --on-accent:#ffffff;
+  --scrim:linear-gradient(180deg,rgba(8,14,16,0) 38%,rgba(8,14,16,.82) 100%);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --ground:#0d1314; --surface:#151d1f; --surface-2:#1b2426;
     --ink:#e7eeee; --ink-2:#bcc9ca; --muted:#8ba0a2;
     --line:#283436; --line-soft:#212c2e;
-    --accent:#5cb6c2; --accent-soft:#17383d; --neutral-bar:#4a5a5c;
-    --pos:#4fc294; --warn:#dda34a; --crit:#e57373; --track:#232e30;
+    --accent:#5cb6c2; --accent-soft:#17383d;
+    --pos:#4fc294; --warn:#dda34a; --warn-ink:#dda34a; --crit:#e57373;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+    --shadow-lift:0 2px 4px rgba(0,0,0,.5), 0 20px 40px -18px rgba(0,0,0,.9);
     --on-accent:#08181b;
   }
 }
@@ -29,30 +37,33 @@
   --ground:#0d1314; --surface:#151d1f; --surface-2:#1b2426;
   --ink:#e7eeee; --ink-2:#bcc9ca; --muted:#8ba0a2;
   --line:#283436; --line-soft:#212c2e;
-  --accent:#5cb6c2; --accent-soft:#17383d; --neutral-bar:#4a5a5c;
-  --pos:#4fc294; --warn:#dda34a; --crit:#e57373; --track:#232e30;
+  --accent:#5cb6c2; --accent-soft:#17383d;
+  --pos:#4fc294; --warn:#dda34a; --warn-ink:#dda34a; --crit:#e57373;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  --shadow-lift:0 2px 4px rgba(0,0,0,.5), 0 20px 40px -18px rgba(0,0,0,.9);
   --on-accent:#08181b;
 }
 
 *{box-sizing:border-box}
+html{scroll-padding-top:84px}
 body{margin:0;background:var(--ground);color:var(--ink);
   font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1100px;margin:0 auto;padding:22px 20px 72px;display:flex;flex-direction:column;gap:14px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
 .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
-  letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 
-/* ---- üst bar ---- */
-.bar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
-  gap:16px 24px;padding-bottom:16px;border-bottom:1px solid var(--line)}
-.title{display:flex;flex-direction:column;gap:4px}
-.title h1{margin:0;font-family:Archivo,sans-serif;font-weight:800;
-  font-size:clamp(22px,2.6vw,28px);letter-spacing:-.022em}
-.stamp{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--pos);flex:none}
-.periods{display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+/* ---- sabit üst bar: marka atlama + dönem ---- */
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ground) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);
+  border-bottom:1px solid var(--line)}
+.top-in{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px 20px;flex-wrap:wrap}
+.jump{display:flex;gap:4px;flex-wrap:wrap}
+.jump a{font-family:Archivo,sans-serif;font-weight:600;font-size:13.5px;color:var(--ink-2);
+  text-decoration:none;padding:7px 11px;border-radius:7px;transition:background .15s ease,color .15s ease}
+.jump a:hover{background:var(--surface);color:var(--ink)}
+.jump a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .seg{display:flex;background:var(--surface);border:1px solid var(--line);
   border-radius:8px;padding:3px;gap:2px;box-shadow:var(--shadow)}
 .seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);
@@ -62,85 +73,157 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .seg button:hover{background:var(--surface-2);color:var(--ink)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.range{font-size:11.5px;color:var(--muted);padding-left:3px}
 
-.rule{font-size:12.5px;color:var(--muted);margin:0;max-width:80ch}
-.rule b{color:var(--ink-2);font-weight:600}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 20px 72px;display:flex;flex-direction:column;gap:10px}
+
+/* ---- başlık ---- */
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px 24px;flex-wrap:wrap}
+.head h1{margin:4px 0 0;font-family:Archivo,sans-serif;font-weight:800;
+  font-size:clamp(26px,3vw,34px);letter-spacing:-.025em;line-height:1.05}
+.meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:12px;color:var(--muted)}
+.stamp{display:flex;align-items:center;gap:7px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--pos);flex:none}
+
+.how{margin-top:6px;font-size:12.5px;color:var(--muted);max-width:86ch}
+.how summary{cursor:pointer;color:var(--ink-2);font-weight:600;width:fit-content;
+  list-style:none;display:flex;align-items:center;gap:6px;padding:2px 0}
+.how summary::-webkit-details-marker{display:none}
+.how summary::before{content:"";width:7px;height:7px;border-right:1.6px solid currentColor;
+  border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .18s ease}
+.how[open] summary::before{transform:rotate(45deg)}
+.how summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+.how ol{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.how b{color:var(--ink-2);font-weight:600}
 
 /* ---- marka bölümü ---- */
-.brand{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-.brand-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{margin-top:30px;display:flex;flex-direction:column;gap:14px}
+.brand-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px 18px;flex-wrap:wrap;
+  padding-bottom:10px;border-bottom:1px solid var(--line)}
 .brand-id{display:flex;align-items:center;gap:10px}
-.brand h2{margin:0;font-family:Archivo,sans-serif;font-weight:800;font-size:21px;letter-spacing:-.022em}
-.chip{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.07em;
-  text-transform:uppercase;padding:3px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
-.brand-ctx{font-size:12px;color:var(--muted)}
-.brand-ctx b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink-2)}
+.brand h2{margin:0;font-family:Archivo,sans-serif;font-weight:800;font-size:24px;letter-spacing:-.024em}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.brand-kpi{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.brand-kpi b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink);font-size:13.5px}
 
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+/* bento: #1 iki sütun iki satır, #2–#5 yanında 2x2 */
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,auto);gap:12px}
+.bento > .hero{grid-column:span 2;grid-row:span 2}
 
-/* ---- creative kartı ---- */
-.cr{background:var(--surface);border:1px solid var(--line);border-radius:12px;
-  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
-.thumb{position:relative;aspect-ratio:1/1;background:var(--surface-2);overflow:hidden}
+/* ---- ortak kart ---- */
+.cr{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow);overflow:hidden;transition:transform .2s ease,box-shadow .2s ease}
+.cr:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+.thumb{position:relative;background:var(--surface-2);overflow:hidden}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.thumb .noimg{position:absolute;inset:0;display:grid;place-items:center;
-  font-size:12px;color:var(--muted)}
-.rank{position:absolute;top:10px;left:10px;font-family:Archivo,sans-serif;font-weight:800;
-  font-size:15px;line-height:1;padding:7px 9px;border-radius:7px;
-  background:var(--ink);color:var(--surface);letter-spacing:-.01em}
-.fmt{position:absolute;top:10px;right:10px;font-family:"IBM Plex Mono",monospace;font-size:11px;
-  font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:5px;
-  background:rgba(16,24,26,.72);color:#fff}
-.cr-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px;flex:1}
-.cr-name{font-size:12.5px;color:var(--ink-2);line-height:1.35;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
-.cr-roas{display:flex;align-items:baseline;gap:8px}
-.cr-roas b{font-family:Archivo,sans-serif;font-weight:700;font-size:34px;line-height:1;
-  letter-spacing:-.035em;font-variant-numeric:tabular-nums;color:var(--bc)}
-.cr-roas span{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
-  letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:0;
-  padding-top:12px;border-top:1px solid var(--line-soft)}
-.kv > div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.noimg{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:var(--muted)}
+.rank{font-family:Archivo,sans-serif;font-weight:800;line-height:1;letter-spacing:-.02em}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;padding:3px 7px;border-radius:5px;white-space:nowrap}
+.tag.fmt{background:rgba(10,16,18,.66);color:#fff}
+.tag.basis{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+.tag.low{background:var(--surface);color:var(--warn-ink);border:1px solid var(--line)}
+.name{color:var(--ink-2);line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.big b{font-family:Archivo,sans-serif;font-weight:700;letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;line-height:1}
+.big small{display:block;margin-top:4px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kv{display:grid;margin:0;gap:8px 14px}
+.kv > div{display:flex;flex-direction:column;gap:1px;min-width:0}
 .kv dt{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
-  letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.kv dd{margin:0;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
-  font-size:14.5px;font-weight:500}
-.vid{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kv dd{margin:0;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-weight:500}
+.vid{display:flex;gap:4px 14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .vid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink-2)}
-.cr-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding-top:10px;border-top:1px solid var(--line-soft);font-size:11.5px;color:var(--muted)}
-.cr-foot a{color:var(--accent);font-weight:600;text-decoration:none}
-.cr-foot a:hover{text-decoration:underline}
-.cr-foot a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.link{color:var(--accent);font-weight:600;text-decoration:none;font-size:12.5px;white-space:nowrap}
+.link:hover{text-decoration:underline}
+.link:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:12px;color:var(--muted)}
+
+/* ---- #1 büyük kart ---- */
+.hero{display:flex;flex-direction:column}
+.hero .thumb{flex:1;min-height:340px}
+.hero .over{position:absolute;inset:0;background:var(--scrim);display:flex;flex-direction:column;
+  justify-content:space-between;padding:14px 16px 16px}
+.hero .over-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.hero .rank{font-size:15px;padding:7px 10px;border-radius:7px;background:var(--surface);color:var(--ink)}
+.hero .over-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.hero .big{color:#fff}
+.hero .big b{font-size:clamp(46px,5vw,64px);color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+.hero .big small{color:rgba(255,255,255,.85)}
+.hero .big .band{display:inline-block;width:10px;height:10px;border-radius:50%;
+  background:var(--bc);margin-right:8px;vertical-align:middle;box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.hero .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.hero .name{font-size:13px;-webkit-line-clamp:1}
+.hero .kv{grid-template-columns:repeat(4,minmax(0,1fr))}
+.hero .kv dd{font-size:16px}
+
+/* ---- #2–#5 kompakt kart: kapak solda, bilgi sağda ---- */
+.mini{display:grid;grid-template-columns:42% 1fr;min-height:0}
+/* kapak kartın tüm yüksekliğini doldurur; bento satırı #1'in yarısı kadar */
+.mini .thumb{height:100%;min-height:190px}
+.mini .rank{position:absolute;top:8px;left:8px;font-size:13px;padding:5px 7px;border-radius:6px;
+  background:var(--ink);color:var(--surface)}
+.mini .fmt{position:absolute;bottom:8px;left:8px}
+.mini .body{padding:11px 12px 11px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.mini .tags{display:flex;gap:5px;flex-wrap:wrap}
+.mini .name{font-size:12px;-webkit-line-clamp:2}
+.mini .big b{font-size:28px;color:var(--bc)}
+.mini .kv{grid-template-columns:1fr 1fr;gap:6px 10px}
+.mini .kv dd{font-size:13px}
+.mini .foot{margin-top:auto}
 
 .empty{border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;
-  min-height:220px;padding:20px;text-align:center;font-size:12.5px;color:var(--muted)}
+  min-height:150px;padding:16px;text-align:center;font-size:12.5px;color:var(--muted)}
 
-.notes{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}
-.notes p{margin:0;font-size:12px;color:var(--muted);line-height:1.6;max-width:80ch}
+.notes{margin-top:30px;padding-top:12px;border-top:1px solid var(--line)}
+.notes p{margin:0;font-size:12px;color:var(--muted);line-height:1.6;max-width:86ch}
 .notes b{color:var(--ink-2);font-weight:600}
 
-@media (max-width:880px){ .cards{grid-template-columns:1fr 1fr} }
-@media (max-width:580px){ .cards{grid-template-columns:1fr} }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Tablet: #1 tam genişlikte ama yatay — kare kapağı 16:10'a germek ürünü
+   kadrajdan atıyordu. */
+@media (max-width:1060px){
+  .bento{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bento > .hero{grid-column:span 2;grid-row:auto;flex-direction:row}
+  .hero .thumb{flex:0 0 46%;min-height:0;aspect-ratio:4/5}
+  .hero .body{flex:1;justify-content:center}
+  .hero .name{-webkit-line-clamp:3}
+  .hero .kv{grid-template-columns:1fr 1fr}
+}
+@media (max-width:620px){
+  .bento{grid-template-columns:1fr}
+  .bento > .hero{grid-column:auto;flex-direction:column}
+  .hero .thumb{flex:none;aspect-ratio:4/5}
+  .mini .thumb{height:auto;min-height:0;aspect-ratio:4/5}
+  .meta{align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.cr:hover{transform:none}}
 </style>
 
+<nav class="top" aria-label="Panel gezintisi">
+  <div class="top-in">
+    <div class="jump" id="jump"></div>
+    <div class="seg" role="group" aria-label="Dönem seçimi" id="seg"></div>
+  </div>
+</nav>
+
 <div class="wrap">
-  <header class="bar">
-    <div class="title">
+  <header class="head">
+    <div>
       <span class="eyebrow">Trendyol CPAS · aktif, katalog dışı creative'ler</span>
       <h1>Creative Raporu</h1>
-      <span class="stamp"><span class="dot"></span> Meta Graph API · son senkron <span class="mono" id="stamp"></span></span>
     </div>
-    <div class="periods">
-      <div class="seg" role="group" aria-label="Dönem seçimi" id="seg"></div>
-      <span class="range" id="range"></span>
+    <div class="meta">
+      <span class="stamp"><span class="dot"></span>son senkron <span class="mono" id="stamp"></span></span>
+      <span id="range"></span>
     </div>
   </header>
 
-  <p class="rule" id="rule"></p>
+  <details class="how">
+    <summary>Nasıl sıralanıyor?</summary>
+    <ol id="how-list"></ol>
+  </details>
 
   <main id="brands"></main>
 
@@ -149,12 +232,11 @@ body{margin:0;background:var(--ground);color:var(--ink);
        sıralamaya girmez; kalanlar elle yüklenmiş videolar, collection'lar ve görsellerdir. CPAS'ta
        her reklam atıf için Trendyol kataloğuna bağlı olduğundan "katalog dışı" bu anlama geliyor.
        Aynı video birden çok reklamda kullanılıyorsa tek creative olarak toplanır.
-       <b>Aktif</b> = reklam, reklam seti ve kampanya açık ve reklam dün en az 1 gösterim almış;
-       kapatılmış reklamların creative'leri, geçmişte iyi olsalar da listede yer almaz.
+       <b>Aktif</b> = reklam, reklam seti ve kampanya açık ve reklam dün en az 1 gösterim almış.
        <b>Shared ROAS</b> = Trendyol'la paylaşılan katalog kalemlerinin cirosu ÷ harcama (Meta
        <b>catalog_segment</b>, ana panelle aynı kaynak). <b>CTR</b> link tıklama oranıdır.
-       <b>3 sn izleme</b> videonun en az 3 saniye izlenme oranı, <b>ThruPlay</b> 15 saniye ya da
-       sonuna kadar izlenme oranı — ikisi de gösterime göre. Dönemler dünün sonunda biter.</p>
+       <b>3 sn</b> videonun en az 3 saniye, <b>ThruPlay</b> 15 saniye ya da sonuna kadar izlenme
+       oranı — ikisi de gösterime göre. Dönemler dünün sonunda biter; panel her sabah güncellenir.</p>
   </footer>
 </div>
 
@@ -167,79 +249,136 @@ const money = v => "₺" + tl.format(Math.round(v));
 const pct   = v => "%" + tl2.format(v);
 const esc   = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const band  = r => r < 1 ? "crit" : r < 2 ? "warn" : "pos";
-
-// Uzun süreli 30 gün daha az gürültülü bir sıralama veriyor; varsayılan o.
-let current = DATA.periods.some(p => p.id === "30g") ? "30g" : DATA.periods[0].id;
+const slug  = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-");
 
 // Yalnızca https adreslerine link veriyoruz; API'den gelen değeri körü körüne href'e koymuyoruz.
 const safeUrl = u => (typeof u === "string" && /^https:\/\//.test(u)) ? u : null;
 
-function card(c, i){
-  const b = band(c.roas);
-  const preview = safeUrl(c.preview);
-  const video = c.format === "Video" && c.hook != null
-    ? `<div class="vid"><span>3 sn izleme <b>${pct(c.hook)}</b></span><span>ThruPlay <b>${pct(c.thruplay_rate)}</b></span></div>`
+// 30 gün daha az gürültülü bir sıralama verdiği için varsayılan o.
+let current = DATA.periods.some(p => p.id === "30g") ? "30g" : DATA.periods[0].id;
+
+// Kart neden bu sırada? Satış getirip eşiği geçenler ROAS'la, kalanlar CTR'yle.
+const byRoas = c => !c.low_data && c.roas > 0;
+
+function headline(c){
+  return byRoas(c)
+    ? {value: tl2.format(c.roas) + "×", label: "shared ROAS", color: `var(--${band(c.roas)})`, basis: "ROAS"}
+    : {value: pct(c.ctr), label: c.roas > 0 ? "CTR · ROAS az veri" : "CTR · satış yok", color: "var(--ink)", basis: "CTR"};
+}
+
+function thumbImg(c, eager){
+  return c.thumb
+    ? `<img src="${esc(c.thumb)}" alt="${esc(c.name)} creative kapağı" ${eager ? "" : 'loading="lazy"'} width="600" height="600">`
+    : `<div class="noimg">Kapak yok</div>`;
+}
+
+function tags(c, p){
+  const h = headline(c);
+  return `<span class="tag basis" title="Bu kart ${h.basis} sıralamasında">${h.basis} sırası</span>` +
+    (c.low_data
+      ? `<span class="tag low" title="Bu dönemde ${money(p.min_spend)} eşiğinin altında harcamış; rakamlar az veriye dayanıyor">Az veri</span>`
+      : "");
+}
+
+function videoLine(c){
+  return c.format === "Video" && c.hook != null
+    ? `<div class="vid"><span>3 sn <b>${pct(c.hook)}</b></span><span>ThruPlay <b>${pct(c.thruplay_rate)}</b></span></div>`
     : "";
+}
+
+function previewLink(c){
+  const u = safeUrl(c.preview);
+  return u ? `<a class="link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Reklamı gör ↗</a>` : "";
+}
+
+function heroCard(c, p){
+  const h = headline(c);
   return `
-  <article class="cr" style="--bc:var(--${b})">
+  <article class="cr hero" style="--bc:${h.color}">
     <div class="thumb">
-      ${c.thumb
-        ? `<img src="${esc(c.thumb)}" alt="${esc(c.name)} creative kapağı" loading="lazy" width="600" height="600">`
-        : `<div class="noimg">Kapak yok</div>`}
-      <span class="rank">#${i + 1}</span>
-      <span class="fmt">${esc(c.format)}</span>
+      ${thumbImg(c, true)}
+      <div class="over">
+        <div class="over-top">
+          <span class="rank" aria-label="1. sıra">#1</span>
+          <div class="over-tags"><span class="tag fmt">${esc(c.format)}</span>${tags(c, p)}</div>
+        </div>
+        <div class="big"><b>${h.basis === "ROAS" ? '<span class="band" aria-hidden="true"></span>' : ""}${h.value}</b><small>${h.label}</small></div>
+      </div>
     </div>
-    <div class="cr-body">
-      <div class="cr-name" title="${esc(c.name)}">${esc(c.name)}</div>
-      <div class="cr-roas"><b>${tl2.format(c.roas)}×</b><span>shared ROAS</span></div>
+    <div class="body">
+      <div class="name" title="${esc(c.name)}">${esc(c.name)}</div>
       <dl class="kv">
         <div><dt>Harcama</dt><dd>${money(c.spend)}</dd></div>
         <div><dt>Ciro</dt><dd>${money(c.value)}</dd></div>
         <div><dt>Satış</dt><dd>${tl.format(c.purchases)}</dd></div>
-        <div><dt>CTR</dt><dd>${pct(c.ctr)}</dd></div>
+        <div><dt>${h.basis === "ROAS" ? "CTR" : "ROAS"}</dt><dd>${h.basis === "ROAS" ? pct(c.ctr) : tl2.format(c.roas) + "×"}</dd></div>
       </dl>
-      ${video}
-      <div class="cr-foot">
-        <span>${c.ads} reklamda kullanılıyor</span>
-        ${preview ? `<a href="${esc(preview)}" target="_blank" rel="noopener noreferrer">Reklamı gör ↗</a>` : ""}
-      </div>
+      <div class="foot">${videoLine(c) || "<span></span>"}${previewLink(c)}</div>
     </div>
   </article>`;
 }
 
-function brandSection(b){
+function miniCard(c, i, p){
+  const h = headline(c);
+  return `
+  <article class="cr mini" style="--bc:${h.color}">
+    <div class="thumb">
+      ${thumbImg(c, false)}
+      <span class="rank" aria-label="${i + 1}. sıra">#${i + 1}</span>
+      <span class="tag fmt">${esc(c.format)}</span>
+    </div>
+    <div class="body">
+      <div class="tags">${tags(c, p)}</div>
+      <div class="big"><b>${h.value}</b><small>${h.label}</small></div>
+      <div class="name" title="${esc(c.name)}">${esc(c.name)}</div>
+      <dl class="kv">
+        <div><dt>Harcama</dt><dd>${money(c.spend)}</dd></div>
+        <div><dt>${h.basis === "ROAS" ? "Satış" : "Gösterim"}</dt><dd>${h.basis === "ROAS" ? tl.format(c.purchases) : tl.format(c.impressions)}</dd></div>
+      </dl>
+      <div class="foot">${previewLink(c) || "<span></span>"}</div>
+    </div>
+  </article>`;
+}
+
+function brandSection(b, p){
   const r = b.by_period[current];
   const share = r.total_spend ? r.manual_spend / r.total_spend * 100 : 0;
-  const slots = [...r.top.map(card)];
-  while (slots.length < 3){
-    slots.push(`<div class="empty">Bu dönemde eşiği geçen başka<br>aktif katalog dışı creative yok.</div>`);
+  const cards = r.top.map((c, i) => i === 0 ? heroCard(c, p) : miniCard(c, i, p));
+  while (cards.length < DATA.top_n){
+    cards.push(`<div class="empty${cards.length === 0 ? " hero" : ""}">Bu dönemde gösterilecek başka<br>aktif katalog dışı creative yok.</div>`);
   }
   return `
-  <section class="brand" aria-labelledby="h-${esc(b.account)}">
+  <section class="brand" id="${slug(b.brand)}" aria-labelledby="h-${esc(b.account)}">
     <div class="brand-head">
       <div class="brand-id"><h2 id="h-${esc(b.account)}">${esc(b.brand)}</h2><span class="chip">Trendyol</span></div>
-      <div class="brand-ctx">
-        <b>${r.manual_count}</b> aktif katalog dışı creative · <b>${r.eligible_count}</b> eşiği geçti ·
-        bunların harcaması <b>${money(r.manual_spend)}</b> (hesap toplamının ${pct(share)}'i)
+      <div class="brand-kpi">
+        <span><b>${r.manual_count}</b> aktif creative</span>
+        <span><b>${r.roas_count}</b> satış getirdi</span>
+        <span><b>${money(r.manual_spend)}</b> harcama · hesabın ${pct(share)}'i</span>
       </div>
     </div>
-    <div class="cards">${slots.join("")}</div>
+    <div class="bento">${cards.join("")}</div>
   </section>`;
 }
 
 function render(){
   const p = DATA.periods.find(x => x.id === current);
-  document.getElementById("range").textContent = p.range;
-  document.getElementById("rule").innerHTML =
-    `Sıralama: önce <b>shared ROAS</b>, eşitlikte <b>CTR</b>, sonra <b>harcama</b>. ` +
-    `Yalnızca <b>şu an aktif</b> ve <b>dün gösterim almış</b> reklamlar sayılır. ` +
-    `Gürültüyü kesmek için bu dönemde en az <b>${money(p.min_spend)}</b> harcamış creative'ler sıralamaya girer.`;
-  document.getElementById("brands").innerHTML = DATA.brands.map(brandSection).join("");
+  document.getElementById("range").textContent = `${p.label} · ${p.range}`;
+  document.getElementById("how-list").innerHTML = `
+    <li>Yalnızca <b>şu an aktif</b> ve <b>dün gösterim almış</b> reklamlar sayılır; katalog carousel'leri hariç.</li>
+    <li>Önce satış getirmiş ve bu dönemde en az <b>${money(p.min_spend)}</b> harcamış creative'ler <b>shared ROAS</b>'a göre sıralanır.
+        Eşik, tek bir şanslı satışla şişen ROAS'ı elemek için.</li>
+    <li>Kalan yerler ROAS'ı olmayanlarla <b>CTR</b>'ye göre dolar; bunun için en az
+        <b>${tl.format(DATA.min_fill_impressions)} gösterim</b> gerekir.</li>
+    <li>Harcaması ${money(p.min_spend)}'nin altında kalanlar <b>Az veri</b> diye işaretlenir.</li>`;
+  document.getElementById("brands").innerHTML = DATA.brands.map(b => brandSection(b, p)).join("");
   document.querySelectorAll("#seg button").forEach(btn =>
     btn.setAttribute("aria-pressed", String(btn.dataset.p === current)));
 }
 
 document.getElementById("stamp").textContent = DATA.updated;
+document.getElementById("jump").innerHTML = DATA.brands.map(b =>
+  `<a href="#${slug(b.brand)}">${esc(b.brand)}</a>`).join("");
 document.getElementById("seg").innerHTML = DATA.periods.map(p =>
   `<button type="button" data-p="${esc(p.id)}" aria-pressed="false">${esc(p.label)}</button>`).join("");
 document.getElementById("seg").addEventListener("click", e => {

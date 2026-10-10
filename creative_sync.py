@@ -14,9 +14,10 @@ Kurallar:
   almış. Kapatılmış reklamların creative'leri sıralamaya girmez.
 - Aynı video/görsel birden çok reklamda kullanılıyorsa reklam değil creative
   (video_id / image_hash) bazında toplanır.
-- Sıralama: shared ROAS, eşitlikte link CTR, sonra harcama.
-- Gürültüyü kesmek için dönemde en az MIN_SPEND kadar harcamış creative'ler
-  sıralamaya girer.
+- Önce eşiği geçip satış getirmiş creative'ler ROAS'a göre; kalan yerler
+  ROAS'ı olmayan (ya da harcaması eşiğin altında kalan) ve en az
+  MIN_FILL_IMPRESSIONS gösterim almış creative'lerle CTR'ye göre doldurulur.
+  Harcaması eşiğin altındakiler "az veri" diye işaretlenir.
 
 Kullanım:
     python creative_sync.py
@@ -59,7 +60,12 @@ PERIODS = [
     ("30g", "Son 30 Gün", 30, 250),
 ]
 
-TOP_N = 3
+TOP_N = 5
+
+# Eşiği geçen creative sayısı TOP_N'den azsa boş kalan yerler eşik altındaki
+# aktif creative'lerle doldurulur. Onlar için en az bu kadar gösterim şartı var;
+# yoksa 3 gösterimde 1 tıklama alan bir creative %33 CTR ile birinci çıkar.
+MIN_FILL_IMPRESSIONS = 1000
 
 # Ana panelle aynı satın alma tipi; böylece iki paneldeki ciro tutarlı kalır.
 PURCHASE_TYPES = ["omni_purchase", "purchase"]
@@ -246,20 +252,27 @@ def rank_creatives(account: str, token: str, days: int, min_spend: float,
             g["creative_id"] = creative.get("id")
 
     manual_spend = sum(g["spend"] for g in groups.values())
-    eligible = []
     for g in groups.values():
-        if g["spend"] < min_spend:
-            continue
         imp = g["impressions"]
         g["roas"] = g["value"] / g["spend"] if g["spend"] else 0.0
         g["ctr"] = g["link_clicks"] / imp * 100 if imp else 0.0
         is_video = g["format"] == "Video"
         g["hook"] = g["video_3s"] / imp * 100 if is_video and imp else None
         g["thruplay_rate"] = g["thruplays"] / imp * 100 if is_video and imp else None
-        eligible.append(g)
+        g["low_data"] = g["spend"] < min_spend
 
-    eligible.sort(key=lambda g: (-g["roas"], -g["ctr"], -g["spend"]))
-    top = eligible[:TOP_N]
+    # 1) Satış getirmiş ve eşiği geçmiş creative'ler ROAS'a göre en önde.
+    # 2) Geri kalan her şey (hiç ROAS'ı yok ya da harcaması eşiğin altında —
+    #    yani ROAS'ı şansa açık) CTR'ye göre. Eşiği geçmiş ama satışsız bir
+    #    creative'e, CTR'si çok daha yüksek eşik altı bir creative'in önünde yer
+    #    vermek "ROAS yoksa CTR" kuralına ters düşüyordu.
+    with_roas = sorted((g for g in groups.values() if not g["low_data"] and g["roas"] > 0),
+                       key=lambda g: (-g["roas"], -g["ctr"], -g["spend"]))
+    by_ctr = sorted((g for g in groups.values()
+                     if (g["low_data"] or g["roas"] == 0)
+                     and g["impressions"] >= MIN_FILL_IMPRESSIONS),
+                    key=lambda g: (-g["ctr"], -g["spend"]))
+    top = (with_roas + by_ctr)[:TOP_N]
     for g in top:
         g.pop("_top_spend", None)
         g["purchases"] = int(round(g["purchases"]))
@@ -269,7 +282,7 @@ def rank_creatives(account: str, token: str, days: int, min_spend: float,
         "total_spend": total_spend,
         "manual_spend": manual_spend,
         "manual_count": len(groups),
-        "eligible_count": len(eligible),
+        "roas_count": len(with_roas),
         "top": top,
     }
 
@@ -326,11 +339,12 @@ def main():
                 g["thumb"] = save_thumbnail(g["creative_id"], g["key"], token)
             by_period[pid] = res
             print(f"  {res['manual_count']} katalog dışı creative, "
-                  f"{res['eligible_count']} eşiği geçti, ilk {len(res['top'])} seçildi")
+                  f"{res['roas_count']} ROAS sıralamasında, ilk {len(res['top'])} seçildi")
         brands.append({"brand": brand, "account": account, "by_period": by_period})
 
     updated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    payload = {"updated": updated, "periods": periods_out, "brands": brands}
+    payload = {"updated": updated, "periods": periods_out, "brands": brands,
+               "top_n": TOP_N, "min_fill_impressions": MIN_FILL_IMPRESSIONS}
 
     with open(TEMPLATE, encoding="utf-8") as fh:
         template = fh.read()

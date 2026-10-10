@@ -1,10 +1,15 @@
 name: Daily Creative Panel
 
 on:
-  # Her gün 05:00 UTC = 08:00 İstanbul. Dönemler dünün sonunda bittiği için
-  # günde bir çalışmak yeterli; ana paneldeki 2 saatlik tempoya gerek yok.
+  # Dönemler dünün sonunda bittiği için veri günde bir değişir; ama GitHub'ın
+  # zamanlayıcısı bu repolarda çalışmaları sık sık atlıyor (2026-10-10'da tek
+  # günlük 05:00 slotu hiç çalışmadı, panel bütün gün dünkü veriyle kaldı).
+  # Bu yüzden gün içine yayılmış dört yedek slot var: ilk başarılı çalışma
+  # paneli yeniler, sonrakiler aynı veriyi yeniden üretir, zararı yok.
+  # Dakika 23: saat başları GitHub'da en sıkışık ve en çok atlanan anlar.
+  # 03:23 UTC = 06:23 İstanbul.
   schedule:
-    - cron: "0 5 * * *"
+    - cron: "23 3,7,11,15 * * *"
   workflow_dispatch: {}
 
 permissions:
