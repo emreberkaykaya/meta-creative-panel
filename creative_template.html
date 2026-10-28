@@ -59,6 +59,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
   border-bottom:1px solid var(--line)}
 .top-in{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;
   justify-content:space-between;gap:12px 20px;flex-wrap:wrap}
+.top-l{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
 .jump{display:flex;gap:4px;flex-wrap:wrap}
 .jump a{font-family:Archivo,sans-serif;font-weight:600;font-size:13.5px;color:var(--ink-2);
   text-decoration:none;padding:7px 11px;border-radius:7px;transition:background .15s ease,color .15s ease}
@@ -105,6 +106,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
   text-transform:uppercase;padding:3px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
 .brand-kpi{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
 .brand-kpi b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink);font-size:13.5px}
+.brand-sub{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+@media (max-width:620px){.brand-sub{align-items:flex-start}}
 
 /* bento: #1 iki sütun iki satır, #2–#5 yanında 2x2 */
 .bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,auto);gap:12px}
@@ -122,6 +125,12 @@ body{margin:0;background:var(--ground);color:var(--ink);
   text-transform:uppercase;padding:3px 7px;border-radius:5px;white-space:nowrap}
 .tag.fmt{background:rgba(10,16,18,.66);color:#fff}
 .tag.basis{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+/* durum etiketleri: renk anlamı taşıyor, yanında metin her zaman var */
+.tag.low{background:color-mix(in srgb,var(--warn) 16%,var(--surface));color:var(--warn-ink);
+  border:1px solid color-mix(in srgb,var(--warn) 45%,transparent)}
+.tag.tired{background:color-mix(in srgb,var(--crit) 14%,var(--surface));color:var(--crit);
+  border:1px solid color-mix(in srgb,var(--crit) 45%,transparent)}
+.tag.new{background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
 .name{color:var(--ink-2);line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
 .big b{font-family:Archivo,sans-serif;font-weight:700;letter-spacing:-.035em;
   font-variant-numeric:tabular-nums;line-height:1}
@@ -140,6 +149,21 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;
   font-size:12px;color:var(--muted)}
 
+/* ---- son 14 gün çizgileri ---- */
+.trend{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 16px}
+.spark{display:flex;flex-direction:column;gap:2px;min-width:0}
+.spark-h{display:flex;align-items:baseline;gap:6px;font-family:"IBM Plex Mono",monospace;
+  font-size:11px;letter-spacing:.04em;color:var(--muted)}
+.spark-h b{font-weight:600;color:var(--ink-2)}
+.spark-h .dn{color:var(--crit)}
+.spark svg{display:block;overflow:visible}
+.spark .wk{fill:var(--surface-2)}
+.spark .ln{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.spark.dropped .ln{stroke:var(--crit)}
+.spark .end{fill:var(--accent)} .spark.dropped .end{fill:var(--crit)}
+.trend-note{font-size:11.5px;color:var(--muted)}
+.trend-note b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--crit)}
+
 /* ---- #1 büyük kart ---- */
 .hero{display:flex;flex-direction:column}
 .hero .thumb{flex:1;min-height:340px}
@@ -157,6 +181,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .hero .name{font-size:13px;-webkit-line-clamp:1}
 .hero .kv{grid-template-columns:repeat(4,minmax(0,1fr))}
 .hero .kv dd{font-size:16px}
+.hero .trend{padding-top:10px;border-top:1px solid var(--line-soft)}
 
 /* ---- #2–#5 kompakt kart: kapak solda, bilgi sağda ---- */
 .mini{display:grid;grid-template-columns:42% 1fr;min-height:0}
@@ -167,14 +192,20 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .mini .fmt{position:absolute;bottom:8px;left:8px}
 .mini .body{padding:11px 12px 11px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .mini .tags{display:flex;gap:5px;flex-wrap:wrap}
-.mini .name{font-size:12px;-webkit-line-clamp:2}
+.mini .name{font-size:12px;-webkit-line-clamp:1}
 .mini .big b{font-size:28px;color:var(--bc)}
 .mini .kv{grid-template-columns:1fr 1fr;gap:6px 10px}
 .mini .kv dd{font-size:13px}
 .mini .foot{margin-top:auto}
+.mini .trend{gap:6px 12px}
 
-.empty{border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;
-  min-height:150px;padding:16px;text-align:center;font-size:12.5px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:12px 16px;
+  font-size:13px;color:var(--muted)}
+
+/* katalog özeti: sıralamaya girmeyen harcama da görünsün */
+.cat{display:flex;gap:4px 16px;flex-wrap:wrap;align-items:baseline;font-size:12.5px;color:var(--muted)}
+.cat .eyebrow{color:var(--ink-2)}
+.cat b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink);font-size:13px}
 
 .notes{margin-top:30px;padding-top:12px;border-top:1px solid var(--line)}
 .notes p{margin:0;font-size:12px;color:var(--muted);line-height:1.6;max-width:86ch}
@@ -194,15 +225,21 @@ body{margin:0;background:var(--ground);color:var(--ink);
   .bento{grid-template-columns:1fr}
   .bento > .hero{grid-column:auto;flex-direction:column}
   .hero .thumb{flex:none;aspect-ratio:4/5}
-  .mini .thumb{height:auto;min-height:0;aspect-ratio:4/5}
+  .mini .thumb{min-height:160px}
   .meta{align-items:flex-start}
+  /* kanal + marka + dönem telefonda üç satır tutuyor; yapışkan kalırsa ekranın
+     beşte birini kaplıyor */
+  .top{position:static}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.cr:hover{transform:none}}
 </style>
 
 <nav class="top" aria-label="Panel gezintisi">
   <div class="top-in">
-    <div class="jump" id="jump"></div>
+    <div class="top-l">
+      <div class="seg" role="group" aria-label="Kanal seçimi" id="chan"></div>
+      <div class="jump" id="jump"></div>
+    </div>
     <div class="seg" role="group" aria-label="Dönem seçimi" id="seg"></div>
   </div>
 </nav>
@@ -210,7 +247,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 <div class="wrap">
   <header class="head">
     <div>
-      <span class="eyebrow">Trendyol CPAS · aktif, katalog dışı creative'ler</span>
+      <span class="eyebrow" id="eyebrow"></span>
       <h1>Creative Raporu</h1>
     </div>
     <div class="meta">
@@ -227,15 +264,19 @@ body{margin:0;background:var(--ground);color:var(--ink);
   <main id="brands"></main>
 
   <footer class="notes">
-    <p><b>Katalog reklamları hariç:</b> katalogdan otomatik üretilen dinamik carousel şablonları
-       sıralamaya girmez; kalanlar elle yüklenmiş videolar, collection'lar ve görsellerdir. CPAS'ta
-       her reklam atıf için Trendyol kataloğuna bağlı olduğundan "katalog dışı" bu anlama geliyor.
-       Aynı video birden çok reklamda kullanılıyorsa tek creative olarak toplanır.
+    <p><b>Katalog reklamları sıralamaya girmez:</b> katalogdan otomatik üretilen dinamik carousel
+       şablonları ayrı tutulur, marka başlığındaki <b>Katalog</b> satırında toplamları (açık ya da
+       kapalı, dönemde harcayan hepsi) yazar. Kartlar elle yüklenmiş videolar, collection'lar ve
+       görsellerdir. Aynı video birden çok reklamda kullanılıyorsa tek creative olarak toplanır.
        <b>Aktif</b> = reklam, reklam seti ve kampanya açık ve reklam dün en az 1 gösterim almış.
-       <b>Shared ROAS</b> = Trendyol'la paylaşılan katalog kalemlerinin cirosu ÷ harcama (Meta
-       <b>catalog_segment</b>, ana panelle aynı kaynak). <b>CTR</b> link tıklama oranıdır.
-       <b>3 sn</b> videonun en az 3 saniye, <b>ThruPlay</b> 15 saniye ya da sonuna kadar izlenme
-       oranı — ikisi de gösterime göre. Dönemler dünün sonunda biter; panel her sabah güncellenir.</p>
+       <b>Trendyol ROAS</b> = Trendyol'la paylaşılan katalog kalemlerinin cirosu ÷ harcama (Meta
+       <b>catalog_segment</b>, ana panelle aynı kaynak). <b>D2C ROAS</b> = Meta pikselinin gördüğü
+       web sitesi satın almaları ÷ harcama; Shopify cirosuyla aynı değildir, piksel satışların bir
+       kısmını kaçırabilir. <b>CTR</b> link tıklama oranıdır. <b>3 sn</b> videonun en az 3 saniye
+       izlenme (dikkat çekme), <b>İzlenme</b> 15 saniye ya da sonuna kadar izlenme (ThruPlay)
+       oranı — ikisi de gösterime göre. <b>Frekans</b> reklamların erişim toplamından hesaplanır;
+       aynı kişi iki reklamı görmüşse iki kez sayıldığı için gerçeğinden biraz düşük çıkar, iki
+       hafta aynı biçimde hesaplandığından karşılaştırma tutarlıdır. Dönemler dünün sonunda biter.</p>
   </footer>
 </div>
 
@@ -243,9 +284,11 @@ body{margin:0;background:var(--ground);color:var(--ink);
 /*__DATA__*/
 
 const tl  = new Intl.NumberFormat("tr-TR",{maximumFractionDigits:0});
+const tl1 = new Intl.NumberFormat("tr-TR",{minimumFractionDigits:1,maximumFractionDigits:1});
 const tl2 = new Intl.NumberFormat("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2});
 const money = v => "₺" + tl.format(Math.round(v));
 const pct   = v => "%" + tl2.format(v);
+const x2    = v => tl2.format(v) + "×";
 const esc   = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const band  = r => r < 1 ? "crit" : r < 2 ? "warn" : "pos";
 const slug  = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-");
@@ -253,14 +296,20 @@ const slug  = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-");
 // Yalnızca https adreslerine link veriyoruz; API'den gelen değeri körü körüne href'e koymuyoruz.
 const safeUrl = u => (typeof u === "string" && /^https:\/\//.test(u)) ? u : null;
 
+const EYEBROW = {
+  trendyol: "Trendyol CPAS · aktif, katalog dışı creative'ler",
+  d2c: "D2C web sitesi · aktif, katalog dışı creative'ler",
+};
+
 // 30 gün daha az gürültülü bir sıralama verdiği için varsayılan o.
 let current = DATA.periods.some(p => p.id === "30g") ? "30g" : DATA.periods[0].id;
+let channel = DATA.channels[0].id;
 
-// Kart neden bu sırada? ROAS'ı olanlar ROAS'la, olmayanlar CTR'yle (basis
-// senkronda belirleniyor, panel yeniden hesaplamıyor).
+// Kart neden bu sırada? Satış getirenler düzeltilmiş ROAS'la, getirmeyenler
+// CTR'yle (basis senkronda belirleniyor, panel yeniden hesaplamıyor).
 function headline(c){
   return c.basis === "ROAS"
-    ? {value: tl2.format(c.roas) + "×", label: "shared ROAS", color: `var(--${band(c.roas)})`, basis: "ROAS"}
+    ? {value: x2(c.adj_roas), label: "güvenilir ROAS", color: `var(--${band(c.adj_roas)})`, basis: "ROAS"}
     : {value: pct(c.ctr), label: "CTR · satış yok", color: "var(--ink)", basis: "CTR"};
 }
 
@@ -270,17 +319,62 @@ function thumbImg(c, eager){
     : `<div class="noimg">Kapak yok</div>`;
 }
 
-function tags(c){
-  const h = headline(c);
-  return `<span class="tag basis" title="Bu kart ${h.basis} sıralamasında">${h.basis} sırası</span>` +
-    (c.ads > 1
-      ? `<span class="tag basis" title="Aynı görüntü ${c.ads} reklamda kullanılıyor; rakamlar toplam">${c.ads} reklam</span>`
-      : "");
+function tags(c, r){
+  const t = c.trend || {};
+  const out = [];
+  if (t.status === "fatigue")
+    out.push(`<span class="tag tired" title="Son 7 günde CTR ya da ROAS önceki 7 güne göre belirgin düştü">yoruluyor</span>`);
+  if (t.status === "new")
+    out.push(`<span class="tag new" title="7 günden kısa süredir gösterim alıyor; yorulma henüz ölçülemez">yeni</span>`);
+  if (c.low_data)
+    out.push(`<span class="tag low" title="Hesabın ortalamasıyla ${DATA.prior_purchases} satış getirecek kadar (${money(r.prior_spend)}) harcamadı; ROAS'ı ortalamaya doğru çekildi">az veri</span>`);
+  if (c.ads > 1)
+    out.push(`<span class="tag basis" title="Aynı görüntü ${c.ads} reklamda kullanılıyor; rakamlar toplam">${c.ads} reklam</span>`);
+  return out.join("");
+}
+
+// Son 14 günün küçük çizgisi; son 7 gün gölgeli (yorulma bu iki haftayı karşılaştırıyor).
+function spark(values, label, change, drop, w){
+  const pts = values.map((v, i) => [i, v]).filter(p => p[1] != null);
+  if (pts.length < 2 || pts.every(p => p[1] === 0)) return "";
+  const h = 26, pad = 2, n = values.length - 1;
+  const ys = pts.map(p => p[1]), max = Math.max(...ys), min = Math.min(...ys);
+  const x = i => pad + (w - 2 * pad) * i / n;
+  const y = v => h - pad - (h - 2 * pad) * (max === min ? .5 : (v - min) / (max - min));
+  const d = pts.map((p, k) => `${k ? "L" : "M"}${x(p[0]).toFixed(1)} ${y(p[1]).toFixed(1)}`).join(" ");
+  const last = pts[pts.length - 1];
+  const wk = x(n - 6) - (w - 2 * pad) / n / 2;
+  const dropped = change != null && change <= -drop;
+  // Kırmızı yalnızca yorulma eşiği aşıldıysa; küçük oynamalar nötr kalır.
+  const chg = change == null ? "" :
+    `<span${dropped ? ' class="dn"' : ""}>${change < 0 ? "↓" : "↑"}%${tl.format(Math.abs(change) * 100)}</span>`;
+  const said = change == null ? "karşılaştırma için yeterli veri yok"
+    : `son 7 gün önceki 7 güne göre %${tl.format(Math.abs(change) * 100)} ${change < 0 ? "düşük" : "yüksek"}`;
+  return `
+    <div class="spark${dropped ? " dropped" : ""}">
+      <span class="spark-h"><b>${label}</b>${chg}</span>
+      <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}, son 14 gün: ${said}">
+        <rect class="wk" x="${wk.toFixed(1)}" y="0" width="${(w - wk).toFixed(1)}" height="${h}" rx="3"/>
+        <path class="ln" d="${d}"/>
+        <circle class="end" cx="${x(last[0]).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="2.2"/>
+      </svg>
+    </div>`;
+}
+
+function trendBlock(c, w){
+  const t = c.trend;
+  if (!t) return "";
+  const lines = spark(t.ctr, "CTR", t.ctr_change, DATA.ctr_drop, w) +
+    (c.basis === "ROAS" ? spark(t.roas, "ROAS", t.roas_change, DATA.roas_drop, w) : "");
+  const freq = t.freq
+    ? `<span class="trend-note" title="Frekans son 7 günde önceki 7 güne göre arttı">frekans <b>${tl1.format(t.freq[0])} → ${tl1.format(t.freq[1])}</b></span>`
+    : "";
+  return lines || freq ? `<div class="trend">${lines}${freq}</div>` : "";
 }
 
 function videoLine(c){
   return c.format === "Video" && c.hook != null
-    ? `<div class="vid"><span>3 sn <b>${pct(c.hook)}</b></span><span>ThruPlay <b>${pct(c.thruplay_rate)}</b></span></div>`
+    ? `<div class="vid"><span title="Gösterimlerin yüzde kaçında video en az 3 saniye izlendi">3 sn <b>${pct(c.hook)}</b></span><span title="ThruPlay: 15 saniye ya da sonuna kadar izlenme">İzlenme <b>${pct(c.thruplay_rate)}</b></span></div>`
     : "";
 }
 
@@ -289,7 +383,7 @@ function previewLink(c){
   return u ? `<a class="link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Reklamı gör ↗</a>` : "";
 }
 
-function heroCard(c, p){
+function heroCard(c, r){
   const h = headline(c);
   return `
   <article class="cr hero" style="--bc:${h.color}">
@@ -298,7 +392,7 @@ function heroCard(c, p){
       <div class="over">
         <div class="over-top">
           <span class="rank" aria-label="1. sıra">#1</span>
-          <div class="over-tags"><span class="tag fmt">${esc(c.format)}</span>${tags(c)}</div>
+          <div class="over-tags"><span class="tag fmt">${esc(c.format)}</span>${tags(c, r)}</div>
         </div>
         <div class="big"><b>${h.basis === "ROAS" ? '<span class="band" aria-hidden="true"></span>' : ""}${h.value}</b><small>${h.label}</small></div>
       </div>
@@ -309,14 +403,15 @@ function heroCard(c, p){
         <div><dt>Harcama</dt><dd>${money(c.spend)}</dd></div>
         <div><dt>Ciro</dt><dd>${money(c.value)}</dd></div>
         <div><dt>Satış</dt><dd>${tl.format(c.purchases)}</dd></div>
-        <div><dt>${h.basis === "ROAS" ? "CTR" : "ROAS"}</dt><dd>${h.basis === "ROAS" ? pct(c.ctr) : tl2.format(c.roas) + "×"}</dd></div>
+        <div><dt>${h.basis === "ROAS" ? "Ham ROAS" : "ROAS"}</dt><dd>${x2(c.roas)}</dd></div>
       </dl>
+      ${trendBlock(c, 150)}
       <div class="foot">${videoLine(c) || "<span></span>"}${previewLink(c)}</div>
     </div>
   </article>`;
 }
 
-function miniCard(c, i, p){
+function miniCard(c, i, r){
   const h = headline(c);
   return `
   <article class="cr mini" style="--bc:${h.color}">
@@ -326,65 +421,105 @@ function miniCard(c, i, p){
       <span class="tag fmt">${esc(c.format)}</span>
     </div>
     <div class="body">
-      <div class="tags">${tags(c)}</div>
-      <div class="big"><b>${h.value}</b><small>${h.label}</small></div>
+      <div class="tags">${tags(c, r)}</div>
+      <div class="big"><b>${h.value}</b><small>${h.label}${h.basis === "ROAS" ? ` · ham ${x2(c.roas)}` : ""}</small></div>
       <div class="name" title="${esc(c.name)}">${esc(c.name)}</div>
       <dl class="kv">
         <div><dt>Harcama</dt><dd>${money(c.spend)}</dd></div>
-        <div><dt>${h.basis === "ROAS" ? "Satış" : "Gösterim"}</dt><dd>${h.basis === "ROAS" ? tl.format(c.purchases) : tl.format(c.impressions)}</dd></div>
+        ${h.basis === "ROAS"
+          ? `<div><dt>Satış</dt><dd>${tl.format(c.purchases)}</dd></div>`
+          : `<div><dt>Gösterim</dt><dd>${tl.format(c.impressions)}</dd></div>`}
       </dl>
+      ${trendBlock(c, 88)}
+      ${videoLine(c)}
       <div class="foot">${previewLink(c) || "<span></span>"}</div>
     </div>
   </article>`;
 }
 
-function brandSection(b, p){
-  const r = b.by_period[current];
+function catalogLine(r){
+  const c = r.catalog;
+  if (!c.spend) return `<div class="cat"><span class="eyebrow">Katalog</span><span>bu dönemde katalog reklamı yok</span></div>`;
+  const share = r.total_spend ? c.spend / r.total_spend * 100 : 0;
+  return `<div class="cat" title="Sıralamaya girmeyen dinamik katalog reklamları; açık ya da kapalı, dönemde harcayan hepsi">
+    <span class="eyebrow">Katalog</span>
+    <span><b>${money(c.spend)}</b> harcama</span>
+    <span>ROAS <b>${x2(c.roas)}</b></span>
+    <span>hesabın ${pct(share)}'i</span></div>`;
+}
+
+function section(sec){
+  const r = sec.by_period[current];
   const share = r.total_spend ? r.manual_spend / r.total_spend * 100 : 0;
-  const cards = r.top.map((c, i) => i === 0 ? heroCard(c, p) : miniCard(c, i, p));
-  while (cards.length < DATA.top_n){
-    cards.push(`<div class="empty${cards.length === 0 ? " hero" : ""}">Bu dönemde gösterilecek başka<br>aktif katalog dışı creative yok.</div>`);
-  }
-  return `
-  <section class="brand" id="${slug(b.brand)}" aria-labelledby="h-${esc(b.account)}">
-    <div class="brand-head">
-      <div class="brand-id"><h2 id="h-${esc(b.account)}">${esc(b.brand)}</h2><span class="chip">Trendyol</span></div>
-      <div class="brand-kpi">
+  const id = slug(`${sec.channel}-${sec.brand}`);
+  const label = DATA.channels.find(c => c.id === sec.channel).label;
+  const body = r.top.length
+    ? `<div class="bento">${r.top.map((c, i) => i === 0 ? heroCard(c, r) : miniCard(c, i, r)).join("")}</div>`
+    : `<div class="empty">Bu dönemde aktif katalog dışı creative yok.</div>`;
+  const kpi = r.manual_count ? `
         <span><b>${r.manual_count}</b> aktif creative</span>
         <span><b>${r.roas_count}</b> satış getirdi</span>
+        ${r.prior_spend ? `<span title="Güvenilir ROAS'ın çekildiği değer: aktif creative'lerin toplam cirosu ÷ harcaması">ortalama <b>${x2(r.mean_roas)}</b></span>` : ""}
         <span title="Çan eğrisi alt sınırı: daha az gösterim alan creative'ler sıralamaya girmez">eşik <b>${tl.format(r.min_impressions)}</b> gösterim</span>
-        <span><b>${money(r.manual_spend)}</b> harcama · hesabın ${pct(share)}'i</span>
+        <span><b>${money(r.manual_spend)}</b> harcama · hesabın ${pct(share)}'i</span>` : "";
+  return `
+  <section class="brand" id="${id}" aria-labelledby="h-${id}">
+    <div class="brand-head">
+      <div class="brand-id"><h2 id="h-${id}">${esc(sec.brand)}</h2><span class="chip">${esc(label)}</span></div>
+      <div class="brand-sub">
+        ${kpi ? `<div class="brand-kpi">${kpi}</div>` : ""}
+        ${catalogLine(r)}
       </div>
     </div>
-    <div class="bento">${cards.join("")}</div>
+    ${body}
   </section>`;
 }
 
 function render(){
   const p = DATA.periods.find(x => x.id === current);
+  const secs = DATA.sections.filter(s => s.channel === channel);
+  document.getElementById("eyebrow").textContent = EYEBROW[channel] || "";
   document.getElementById("range").textContent = `${p.label} · ${p.range}`;
   document.getElementById("how-list").innerHTML = `
     <li>Yalnızca <b>şu an aktif</b> ve <b>dün gösterim almış</b> reklamlar sayılır; katalog carousel'leri hariç.</li>
     <li><b>Aynı video tek kart:</b> reklam kopyalanınca video yeniden yüklenip yeni ID alıyor; kapaklar görsel olarak
         karşılaştırılıp birebir aynı olanlar birleştirilir, rakamları toplanır.</li>
-    <li><b>Çan eğrisi:</b> her hesabın creative'leri gösterim dağılımına göre değerlendirilir. Ortalamanın yarım standart
-        sapma altında kalan az gösterimli kuyruk elenir; böylece birkaç yüz gösterimle şişen ROAS ya da CTR öne çıkmaz.
+    <li><b>Çan eğrisi:</b> hesabın creative'leri gösterim dağılımına göre değerlendirilir; az gösterimli kuyruk elenir.
         Hesaba göre değişen bu sınır marka başlığında "eşik" olarak yazar.</li>
-    <li><b>Sıralama:</b> ROAS'ı olan her zaman önde, en yüksek <b>shared ROAS</b> birinci; ROAS'ı olmayanlar en yüksek <b>CTR</b>'ye göre.</li>`;
-  document.getElementById("brands").innerHTML = DATA.brands.map(b => brandSection(b, p)).join("");
+    <li><b>Güvenilir ROAS:</b> her creative'in ROAS'ı hesabın ortalamasına doğru çekilir. Ne kadar az harcadıysa o kadar çok
+        çekilir: hesabın ortalamasıyla ${DATA.prior_purchases} satış getirecek kadar harcayan creative'in kendi sonucu yarı
+        ağırlık taşır, daha azı <b>az veri</b> etiketi alır. Kartta düzeltilmemiş değer "ham" olarak yazar.</li>
+    <li><b>Sıralama:</b> önce yeterince harcayıp ortalamanın üstünde kalan (kanıtlanmış) creative'ler, sonra satış getiren
+        diğerleri — ikisi de güvenilir ROAS'a göre. Böylece ₺69 harcayıp 2 satışla 29× çıkan creative, binlerce lira
+        harcayıp ortalamanın üstünde satanın önüne geçmez. Satış getirmeyenler arkadan en yüksek <b>CTR</b>'ye göre.</li>
+    <li><b>Yorulma:</b> çizgiler son 14 günü 3 günlük toplamlarla gösterir, gölgeli kısım son 7 gün. Son 7 günde CTR
+        %${tl.format(DATA.ctr_drop * 100)} ya da ROAS %${tl.format(DATA.roas_drop * 100)} veya daha fazla düştüyse kart
+        <b>yoruluyor</b> etiketi alır; frekans arttıysa altında yazar. 7 günden kısa süredir yayında olanlar <b>yeni</b>.
+        Çizgiler seçilen dönemden bağımsızdır.</li>`;
+  document.getElementById("brands").innerHTML = secs.map(section).join("");
+  document.getElementById("jump").innerHTML = secs.map(s =>
+    `<a href="#${slug(`${s.channel}-${s.brand}`)}">${esc(s.brand)}</a>`).join("");
   document.querySelectorAll("#seg button").forEach(btn =>
     btn.setAttribute("aria-pressed", String(btn.dataset.p === current)));
+  document.querySelectorAll("#chan button").forEach(btn =>
+    btn.setAttribute("aria-pressed", String(btn.dataset.c === channel)));
 }
 
 document.getElementById("stamp").textContent = DATA.updated;
-document.getElementById("jump").innerHTML = DATA.brands.map(b =>
-  `<a href="#${slug(b.brand)}">${esc(b.brand)}</a>`).join("");
 document.getElementById("seg").innerHTML = DATA.periods.map(p =>
   `<button type="button" data-p="${esc(p.id)}" aria-pressed="false">${esc(p.label)}</button>`).join("");
+document.getElementById("chan").innerHTML = DATA.channels.map(c =>
+  `<button type="button" data-c="${esc(c.id)}" aria-pressed="false">${esc(c.label)}</button>`).join("");
 document.getElementById("seg").addEventListener("click", e => {
   const btn = e.target.closest("button");
   if (!btn) return;
   current = btn.dataset.p;
+  render();
+});
+document.getElementById("chan").addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  channel = btn.dataset.c;
   render();
 });
 render();
