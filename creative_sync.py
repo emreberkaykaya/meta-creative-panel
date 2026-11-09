@@ -63,14 +63,15 @@ SITE_DIR = os.path.join(HERE, "_site")
 THUMB_DIR = os.path.join(SITE_DIR, "thumbs")
 
 # (kanal, marka, reklam hesabı, marka token'ının env değişkeni). D2C hesapları
-# ana paneldeki D2C_META_ACCOUNTS'la aynı; marka token'ları ikisine de erişiyor.
-# MissLiva D2C 2026-10-28 itibarıyla 30 gündür harcamasız olduğu için yok.
+# ana paneldeki D2C_META_ACCOUNTS'la aynı; marka token'ları ikisine de erişiyor
+# (MissLiva'nın "Missliva.com" hesabı Aqua di Polo portföyünde, onun token'ıyla).
 ACCOUNTS = [
     ("trendyol", "Aqua di Polo", "1491645661756000", "META_ACCESS_TOKEN_AQUA_DI_POLO"),
     ("trendyol", "Frime", "1094178842462484", "META_ACCESS_TOKEN_FRIME"),
     ("trendyol", "Pierre Cardin", "1453774025708518", "META_ACCESS_TOKEN_PIERRE_CARDIN"),
     ("d2c", "Aqua di Polo", "1215686160473015", "META_ACCESS_TOKEN_AQUA_DI_POLO"),
     ("d2c", "Frime", "2121533615302118", "META_ACCESS_TOKEN_FRIME"),
+    ("d2c", "MissLiva", "1585933623231067", "META_ACCESS_TOKEN_AQUA_DI_POLO"),
 ]
 
 # Satın almanın kaynağı kanala göre değişir. Trendyol CPAS'ta ciro Trendyol'la
